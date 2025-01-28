@@ -12,7 +12,7 @@ class ContactService {
           }
 
           return contacts.map(contact => 
-              `${contact.name}: ${contact.email || 'No Email'}, ${contact.phone || 'No Phone'}`
+              `${contact.name}: ${contact.phone || 'No Phone'}`
           );
       } catch (error) {
           console.error('Error finding matching contacts:', error);
