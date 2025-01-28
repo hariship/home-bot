@@ -44,7 +44,7 @@ class DatabaseService {
     try {
       const result = await this.pool.query(
         'SELECT * FROM contacts WHERE name ILIKE $1',
-        [`${query}%`]
+        [`%${query}%`]
       );
       console.log(result)
       return result.rows;
