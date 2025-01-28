@@ -40,7 +40,7 @@ class GoogleContactsService {
       this.oAuth2Client = new google.auth.OAuth2(
         client_id,
         client_secret,
-        redirect_uris[0]
+        redirect_uris[1]
       );
     } catch (error) {
       console.error('Failed to initialize OAuth2 client:', error);
