@@ -1,20 +1,24 @@
 class ContactService {
-    constructor(contactsData) {
-      this.contacts = contactsData;
-    }
-  
-    findMatchingContacts(query) {
-      const results = [];
-      const normalizedQuery = query.toLowerCase();
-  
-      for (const [name, details] of Object.entries(this.contacts)) {
-        if (name.toLowerCase().startsWith(normalizedQuery)) {
-          results.push(`${name}: ${details}`);
-        }
-      }
-  
-      return results;
-    }
+  constructor(databaseService) {
+      this.databaseService = databaseService;
   }
 
-  module.exports = ContactService;
+  async findMatchingContacts(query) {
+      try {
+          const contacts = await this.databaseService.findContacts(query);
+
+          if (contacts.length === 0) {
+              return [];
+          }
+
+          return contacts.map(contact => 
+              `${contact.name}: ${contact.email || 'No Email'}, ${contact.phone || 'No Phone'}`
+          );
+      } catch (error) {
+          console.error('Error finding matching contacts:', error);
+          return [];
+      }
+  }
+}
+
+module.exports = ContactService;
