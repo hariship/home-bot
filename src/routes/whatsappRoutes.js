@@ -3,7 +3,7 @@ const { MessagingResponse } = require('twilio').twiml;
 
 const router = express.Router();
 
-async function createWhatsappRoutes(contactService, twilioService, googleContactsService) {
+function createWhatsappRoutes(contactService, twilioService, googleContactsService) {
   router.post('/contacts', async (req, res) => {
     const incomingMessage = req.body.Body.trim();
     const twiml = new MessagingResponse();
