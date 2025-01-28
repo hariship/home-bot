@@ -34,7 +34,7 @@ function createSyncRoutes(googleContactsService) {
   // Endpoint to handle OAuth callback
   router.get('/auth-callback', async (req, res) => {
     try {
-      const { code } = req.body;
+      const { code } = req.params;
       if (!code) {
         return res.status(400).json({
           status: 'error',
