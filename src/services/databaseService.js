@@ -46,6 +46,7 @@ class DatabaseService {
         'SELECT * FROM contacts WHERE name ILIKE $1',
         [`${query}%`]
       );
+      console.log(result)
       return result.rows;
     } catch (error) {
       console.error('Error finding contacts:', error);

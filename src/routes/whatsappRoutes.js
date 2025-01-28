@@ -39,7 +39,7 @@ function createWhatsappRoutes(contactService, twilioService, googleContactsServi
 
     // Search for matching contacts
     const matchingContacts = contactService.findMatchingContacts(incomingMessage);
-
+    console.log(matchingContacts)
     if (matchingContacts.length > 0) {
       const contactDetails = matchingContacts.join('\n');
       await twilioService.sendMessage(
