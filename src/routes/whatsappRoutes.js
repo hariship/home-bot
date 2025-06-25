@@ -2,9 +2,27 @@ const express = require('express');
 const { MessagingResponse } = require('twilio').twiml;
 const logger = require('../utils/logger');
 const router = express.Router();
+const {ALLOWED_SENDERS} = require('../utils/constants');
 
 function createWhatsappRoutes(contactService, twilioService, googleContactsService) {
   router.post('/contacts', async (req, res) => {
+
+    const allowedSenders = ALLOWED_SENDERS
+        ? ALLOWED_SENDERS.split(',').map((n) => n.trim())
+        : [];
+
+        const sender = req.body.From;
+
+        if (!allowedSenders.includes(sender)) {
+            logger.warn(`Blocked message from unknown sender: ${sender}`);
+
+            const twiml = new MessagingResponse();
+            twiml.message('Sorry, you are not authorized to use this service.');
+
+            res.writeHead(403, { 'Content-Type': 'text/xml' });
+            return res.end(twiml.toString());
+        }
+
     const incomingMessage = req.body.Body.trim();
     const twiml = new MessagingResponse();
 
