@@ -8,6 +8,13 @@ function createWhatsappRoutes(contactService, twilioService, googleContactsServi
     const incomingMessage = req.body.Body.trim();
     const twiml = new MessagingResponse();
 
+    if (!req.body || typeof req.body.Body !== 'string' || !req.body.Body.trim()) {
+        twiml.message('Invalid request. Please send a valid contact name or type "sync".');
+        logger.warn('Invalid or missing message body');
+        res.writeHead(400, { 'Content-Type': 'text/xml' });
+        return res.end(twiml.toString());
+      }
+
     // Check if user requested a sync
     if (incomingMessage && incomingMessage.toLowerCase() === 'sync') {
       try {
