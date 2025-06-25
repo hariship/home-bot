@@ -21,7 +21,13 @@ jobs:
           payload="{\"connection_type\": \"GITHUB\", \"repository_connection_id\": 2, \"source_data\": ["
           sep=""
 
-          for sha in $(git rev-list --no-merges "${{ github.event.before }}..${{ github.event.after }}"); do
+          shas=$(git rev-list --no-merges "${{ github.event.before }}..${{ github.event.after }}" 2>/dev/null)
+          if [ -z "$shas" ]; then
+           echo "⚠️ Empty or invalid revision range. Falling back to last 5 commits."
+           shas=$(git rev-list -n 5 HEAD)
+          fi
+
+          for sha in $shas; do
             commit_msg=$(git log -1 --pretty=format:"%s" "$sha")
             file_changes="[]"
 
