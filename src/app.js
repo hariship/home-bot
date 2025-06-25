@@ -8,6 +8,9 @@ const GoogleContactsService = require('./services/googleContactsService');
 const createWhatsappRoutes = require('./routes/whatsappRoutes');
 const createSyncRoutes = require('./routes/syncRoutes');
 const createAuthRoutes = require('./routes/authRoutes');
+const { SlackService } = require('./services/slackService');
+const createSlackRoutes = require('./routes/slackRoutes');
+const errorHandler = require('./middleware/errorHandler');
 
 function createApp() {
   const app = express();
@@ -22,8 +25,11 @@ function createApp() {
   app.use('/whatsapp', createWhatsappRoutes(contactService, twilioService, googleContactsService));
   app.use('/sync', createSyncRoutes(googleContactsService));
   app.use('/', createAuthRoutes(googleContactsService));
-
+  app.use('/slack', createSlackRoutes(SlackService));
+  app.use(errorHandler);
   return app;
 }
+
+
 
 module.exports = createApp;
