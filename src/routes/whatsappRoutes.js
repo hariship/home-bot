@@ -45,20 +45,28 @@ function createWhatsappRoutes(contactService, twilioService, googleContactsServi
     }
 
     // Search for matching contacts
-    const matchingContacts = await contactService.findMatchingContacts(incomingMessage);
-    logger.info(matchingContacts)
-    if (matchingContacts.length > 0) {
-      const contactDetails = matchingContacts.join('\n');
-      await twilioService.sendMessage(
-        req.body.From,
-        `Here are the matching contacts:\n${contactDetails}`
-      );
-    } else {
-      twiml.message('No matching contacts found!');
-    }
+    try {
+        const matchingContacts = await contactService.findMatchingContacts(incomingMessage);
+        logger.info(matchingContacts);
+      
+        if (matchingContacts.length > 0) {
+          const contactDetails = matchingContacts.join('\n');
+          await twilioService.sendMessage(
+            req.body.From,
+            `Here are the matching contacts:\n${contactDetails}`
+          );
+        } else {
+          twiml.message('No matching contacts found!');
+          res.writeHead(200, { 'Content-Type': 'text/xml' });
+          return res.end(twiml.toString());
+        }
+      } catch (error) {
+        logger.error('Contact lookup failed:', error);
+        twiml.message('Sorry, something went wrong while looking up contacts.');
+        res.writeHead(500, { 'Content-Type': 'text/xml' });
+        return res.end(twiml.toString());
+      }
 
-    res.writeHead(200, { 'Content-Type': 'text/xml' });
-    res.end(twiml.toString());
   });
 
   return router;
