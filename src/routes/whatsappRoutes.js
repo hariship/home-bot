@@ -34,8 +34,7 @@ function createWhatsappRoutes(contactService, twilioService, googleContactsServi
       }
 
       if (incomingMessage.toLowerCase() === 'help') {
-        twiml.message(`Hi! Here’s what I can do:
-      • Send a name to search for matching contacts.
+        twiml.message(`Hi! Here is what I can do:
       • Type "sync" to sync contacts from Google.
       • Type "help" to see this message again.`);
       
