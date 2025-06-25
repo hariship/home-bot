@@ -86,7 +86,7 @@ jobs:
           echo "✅ Final Payload:"
           echo "${payload}" | jq .
 
-          curl -X POST https://api-core-develop.knowledgekeeper.ai/api/git/webhook \
+          curl -X POST https://api-core-develop.knowledgekeeper.ai/api/v1/webhooks/git \
             -H "x-api-key: 8e9a6c540e2589e3200a824c27b502331e7565348d706cae786d961534063170" \
             -H "Content-Type: application/json" \
             -d "${payload}"
