@@ -1,5 +1,6 @@
 const twilio = require('twilio');
 const config = require('../config/config');
+const logger = require('./utils/logger');
 
 class TwilioService {
   constructor() {
@@ -8,6 +9,7 @@ class TwilioService {
 
   async sendMessage(to, body) {
     try {
+      logger.info('Sending message to WhatsApp bot...');
       await this.client.messages.create({
         body,
         from: config.twilio.whatsappNumber,
@@ -15,7 +17,7 @@ class TwilioService {
       });
       return true;
     } catch (error) {
-      console.error('Error sending message via Twilio:', error.message);
+      logger.error('Twilio auth failed', err);
       return false;
     }
   }
