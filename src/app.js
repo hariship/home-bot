@@ -12,16 +12,19 @@ const { SlackService } = require('./services/slackService');
 const createSlackRoutes = require('./routes/slackRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const createHealthRoutes = require('./routes/healthRoutes');
+const cors = require('cors');
 
 function createApp() {
   const app = express();
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
+  app.use(cors());
 
   const databaseService = new DatabaseService();
   const contactService = new ContactService(databaseService);
   const twilioService = new TwilioService();
   const googleContactsService = new GoogleContactsService(databaseService);
+
 
   app.use('/whatsapp', createWhatsappRoutes(contactService, twilioService, googleContactsService));
   app.use('/sync', createSyncRoutes(googleContactsService));
