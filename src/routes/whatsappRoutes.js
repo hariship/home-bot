@@ -33,6 +33,16 @@ function createWhatsappRoutes(contactService, twilioService, googleContactsServi
         return res.end(twiml.toString());
       }
 
+      if (incomingMessage.toLowerCase() === 'help') {
+        twiml.message(`Hi! Here’s what I can do:
+      • Send a name to search for matching contacts.
+      • Type "sync" to sync contacts from Google.
+      • Type "help" to see this message again.`);
+      
+        res.writeHead(200, { 'Content-Type': 'text/xml' });
+        return res.end(twiml.toString());
+      }
+
     // Check if user requested a sync
     if (incomingMessage && incomingMessage.toLowerCase() === 'sync') {
       try {
@@ -65,7 +75,6 @@ function createWhatsappRoutes(contactService, twilioService, googleContactsServi
     // Search for matching contacts
     try {
         const matchingContacts = await contactService.findMatchingContacts(incomingMessage);
-        logger.info(matchingContacts);
       
         if (matchingContacts.length > 0) {
           const contactDetails = matchingContacts.join('\n');
