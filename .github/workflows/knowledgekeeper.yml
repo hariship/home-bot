@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # fetch full git history
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -21,10 +23,12 @@ jobs:
           payload="{\"connection_type\": \"GITHUB\", \"repository_connection_id\": 2, \"source_data\": ["
           sep=""
 
+          set +e  # Don't exit immediately on error
           shas=$(git rev-list --no-merges "${{ github.event.before }}..${{ github.event.after }}" 2>/dev/null)
+          set -e
           if [ -z "$shas" ]; then
-           echo "⚠️ Empty or invalid revision range. Falling back to last 5 commits."
-           shas=$(git rev-list -n 5 HEAD)
+            echo "⚠️ Empty or invalid revision range. Falling back to last 5 commits."
+            shas=$(git rev-list -n 5 HEAD)
           fi
 
           for sha in $shas; do
