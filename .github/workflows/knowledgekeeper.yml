@@ -49,7 +49,7 @@ jobs:
               summary="$file: $added additions, $removed deletions"
 
               if [ "$change_type" != "deleted" ]; then
-                diff_info=$(git diff --unified=1 "$sha^" "$sha" -- "$file" | grep -v "^@@" | grep -v "^index" | grep -v "^diff" | grep -v "^---" | grep -v "^+++" | head -10)
+                diff_info=$(git diff --unified=1 "$sha^" "$sha" -- "$file" | grep -v "^@@" | grep -v "^index" | grep -v "^diff" | grep -v "^---" | grep -v "^+++" )
                 if [ -n "$diff_info" ]; then
                   diff_info_escaped=$(echo "$diff_info" | jq -Rs .)
                 else
