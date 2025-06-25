@@ -1,6 +1,6 @@
 const express = require('express');
 const { MessagingResponse } = require('twilio').twiml;
-
+const logger = require('../utils/logger');
 const router = express.Router();
 
 function createWhatsappRoutes(contactService, twilioService, googleContactsService) {
@@ -28,7 +28,7 @@ function createWhatsappRoutes(contactService, twilioService, googleContactsServi
           message: 'Contacts synchronized successfully'
         });
       } catch (error) {
-        console.error('Sync error:', error);
+        logger.error('Sync error:', error);
         return res.status(500).json({
           status: 'error',
           message: 'Failed to sync contacts',
@@ -39,7 +39,7 @@ function createWhatsappRoutes(contactService, twilioService, googleContactsServi
 
     // Search for matching contacts
     const matchingContacts = await contactService.findMatchingContacts(incomingMessage);
-    console.log(matchingContacts)
+    logger.info(matchingContacts)
     if (matchingContacts.length > 0) {
       const contactDetails = matchingContacts.join('\n');
       await twilioService.sendMessage(
