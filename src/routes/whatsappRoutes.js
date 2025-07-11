@@ -95,13 +95,45 @@ function createWhatsappRoutes(contactService, twilioService, googleContactsServi
 
   });
 
-  router.post('/slack', (req, res) => {
-    logger.info('Received request on /slack', { body: req.body });
-    res.json({
-      status: 'ok',
-      message: 'Dummy Slack endpoint reached.'
+  router.post('/slack', async (req, res) => {
+    const payload = req.body;
+    logger.info('Received Slack event', { payload });
+  
+    // Dummy handling for Slack's URL verification
+    if (payload.type === 'url_verification') {
+      logger.info('Responding to Slack URL verification challenge');
+      return res.json({ challenge: payload.challenge });
+    }
+  
+    // Dummy handling for Slack message events
+    if (payload.type === 'event_callback') {
+      const event = payload.event;
+  
+      if (event.type === 'message' && !event.bot_id) {
+        logger.info(`Received a Slack message from ${event.user}: ${event.text}`);
+  
+        // Simulate sending a response back to Slack (would require actual Slack API for real)
+        return res.json({
+          status: 'received',
+          message: `Echoed back: "${event.text}"`,
+          user: event.user,
+        });
+      }
+  
+      logger.info('Unhandled event type or bot message', { event });
+      return res.json({
+        status: 'ignored',
+        message: 'Only user-generated messages are processed.',
+      });
+    }
+  
+    // Fallback for unknown types
+    logger.warn('Unknown Slack event type received', { type: payload.type });
+    return res.status(400).json({
+      status: 'error',
+      message: 'Unknown Slack event type.',
     });
-  });
+  });  
 
   return router;
 }
