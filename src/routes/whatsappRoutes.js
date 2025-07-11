@@ -95,6 +95,14 @@ function createWhatsappRoutes(contactService, twilioService, googleContactsServi
 
   });
 
+  router.post('/slack', (req, res) => {
+    logger.info('Received request on /slack', { body: req.body });
+    res.json({
+      status: 'ok',
+      message: 'Dummy Slack endpoint reached.'
+    });
+  });
+
   return router;
 }
 
