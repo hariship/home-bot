@@ -97,75 +97,90 @@ function createWhatsappRoutes(contactService, twilioService, googleContactsServi
 
   router.post('/slack', async (req, res) => {
     const payload = req.body;
-    logger.info('Received Slack event', { payload });
+    logger.info('🟢 Incoming Slack webhook payload', { payload });
   
-    // 1. URL verification (required during Slack setup)
+    // Slack's URL verification during initial setup
     if (payload.type === 'url_verification') {
-      logger.info('Slack URL verification request');
+      logger.info('✅ URL verification challenge received from Slack');
       return res.json({ challenge: payload.challenge });
     }
   
-    // 2. Handle event callbacks
+    // Event Callback - Main Slack Event Dispatcher
     if (payload.type === 'event_callback') {
       const event = payload.event;
+      logger.info(`📩 Event Type: ${event.type}`, { user: event.user, channel: event.channel });
   
-      // Ignore bot messages
+      // 1. Ignore bot-generated messages
       if (event.bot_id) {
-        logger.info('Ignoring bot message');
-        return res.status(200).send(); // Respond quickly to avoid retries
+        logger.info('⚠️ Ignored message from bot user');
+        return res.status(200).send(); // Avoid Slack retries
       }
   
-      // 3. Handle user messages
+      // 2. Handle user messages
       if (event.type === 'message') {
-        logger.info(`Slack user ${event.user} said: ${event.text}`);
+        const messageText = (event.text || '').toLowerCase();
   
-        // Dummy keyword response
-        if (event.text.toLowerCase().includes('help')) {
-          logger.info('Detected "help" keyword in Slack message');
-          // Simulate sending help message
+        logger.info(`💬 User Message: "${event.text}" from ${event.user}`);
+  
+        // Simulate slash command or keyword triggers
+        if (messageText.includes('help') || messageText.startsWith('/help')) {
+          logger.info('📘 Responding to help request');
           return res.json({
-            status: 'responded',
-            message: 'Here is what I can do:\n• Echo messages\n• Respond to "help"\n• Track reactions',
+            response_type: 'ephemeral',
+            message: `🛠️ *Slack Integration Help Menu*\n• Type \`/help\` – Get this menu\n• Type \`/sync\` – Simulate sync\n• Mention a topic to get dummy resources.`,
           });
         }
   
-        // Simulate delayed response
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // 1s delay
+        if (messageText.includes('sync')) {
+          logger.info('🔄 Simulating contact sync request via Slack message');
+          return res.json({
+            response_type: 'in_channel',
+            message: `Contacts are being synced... ✅ (Dummy response)`,
+          });
+        }
   
+        // 3. Threaded reply (dummy)
+        const isThread = !!event.thread_ts;
+        if (isThread) {
+          logger.info(`📎 Replying in thread: ${event.thread_ts}`);
+          return res.json({
+            thread_ts: event.thread_ts,
+            message: `👋 Thanks for replying in thread! This is a threaded response (simulated).`,
+          });
+        }
+  
+        // 4. General echo
         return res.json({
-          status: 'received',
-          echo: event.text,
+          response_type: 'in_channel',
+          message: `Echo: "${event.text}"`,
           user: event.user,
-          channel: event.channel,
         });
       }
   
-      // 4. Handle reactions (dummy logging)
+      // 5. Reaction events
       if (event.type === 'reaction_added') {
-        logger.info(`User ${event.user} added reaction :${event.reaction}: to item`, event.item);
+        logger.info(`😊 Reaction ":${event.reaction}:" added by ${event.user} on`, event.item);
         return res.json({
-          status: 'tracked',
-          message: `Reaction :${event.reaction}: noted.`,
+          status: 'reaction_logged',
+          message: `Got your :${event.reaction}: reaction!`,
         });
       }
   
-      // 5. Unknown event type
-      logger.warn(`Unhandled Slack event type: ${event.type}`);
-      return res.status(200).json({
+      // 6. Unhandled events
+      logger.warn(`🚫 Unhandled event type: ${event.type}`);
+      return res.json({
         status: 'ignored',
-        message: `No handler for event type "${event.type}"`,
+        message: `No action taken for event type "${event.type}".`,
       });
     }
   
-    // 6. Catch-all fallback
-    logger.error('Unknown Slack payload structure', payload);
+    // 7. Catch-all error for unknown requests
+    logger.error('❌ Unknown or malformed Slack request structure', { body: req.body });
     return res.status(400).json({
       status: 'error',
-      message: 'Unsupported Slack request type',
+      message: 'Invalid Slack request structure',
     });
-  });    
-
-  return router;
-}
+  });
+}  
 
 module.exports = createWhatsappRoutes;
