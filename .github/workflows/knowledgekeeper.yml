@@ -1,11 +1,11 @@
 name: Knowledge Keeper Structured Commits
   
-  on:
+on:
     push:
       branches:
         - main
   
-  jobs:
+jobs:
     send-diff-metadata:
       runs-on: ubuntu-latest
       steps:
