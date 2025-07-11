@@ -1,11 +1,11 @@
 name: Knowledge Keeper Structured Commits
   
-on:
+  on:
     push:
-        branches:
+      branches:
         - main
   
-jobs:
+  jobs:
     send-diff-metadata:
       runs-on: ubuntu-latest
       steps:
@@ -20,7 +20,7 @@ jobs:
           run: |
             echo "🔄 Generating structured commit diff payload..."
   
-            payload="{\"connection_type\": \"GITHUB\", \"repository_connection_id\": 11, \"source_data\": ["
+            payload="{\"connection_type\": \"GITHUB\", \"repository_connection_id\": 12, \"source_data\": ["
             sep=""
   
             set +e
@@ -87,7 +87,7 @@ jobs:
             echo "${payload}" | jq .
   
             curl -X POST https://api-core.knowledgekeeper.ai/api/v1/webhooks/git \
-              -H "x-api-key: 270d3bd512f39656a133a0cd0b933f1aaa97fa76b4f65c762e75e05b45649b47" \
+              -H "x-api-key: a077ca029a06ebf62f5c13880f1b9c07e4ebc054681d7ad1e1b6e93f37c69115" \
               -H "Content-Type: application/json" \
               -d "${payload}"
   
